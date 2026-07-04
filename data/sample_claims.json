@@ -1,0 +1,34 @@
+[
+  {
+    "claim_id": "CLM-001",
+    "procedure_code": "E2103",
+    "diagnosis_code": "E11.9",
+    "service_date": "2026-06-01",
+    "last_service_date": "2025-04-10",
+    "prior_auth_obtained": true
+  },
+  {
+    "claim_id": "CLM-002",
+    "procedure_code": "E2103",
+    "diagnosis_code": "Z00.00",
+    "service_date": "2026-06-01",
+    "last_service_date": null,
+    "prior_auth_obtained": true
+  },
+  {
+    "claim_id": "CLM-003",
+    "procedure_code": "E2103",
+    "diagnosis_code": "E11.9",
+    "service_date": "2026-06-01",
+    "last_service_date": "2026-03-01",
+    "prior_auth_obtained": true
+  },
+  {
+    "claim_id": "CLM-004",
+    "procedure_code": "E2103",
+    "diagnosis_code": "E10.1",
+    "service_date": "2026-06-01",
+    "last_service_date": null,
+    "prior_auth_obtained": false
+  }
+]

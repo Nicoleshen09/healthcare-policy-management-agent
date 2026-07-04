@@ -1,0 +1,13 @@
+{
+  "procedure_code": "E2103",
+  "covered_diagnosis_prefixes": ["E10", "E11"],
+  "frequency_limit_days": 365,
+  "prior_auth_required": true,
+  "notes": "Reference extraction for demo (offline) mode. In LLM mode the agent extracts these fields from the policy text at runtime.",
+  "citations": {
+    "procedure_code": "Section 1",
+    "covered_diagnosis_prefixes": "Section 2",
+    "frequency_limit_days": "Section 3",
+    "prior_auth_required": "Section 4"
+  }
+}
