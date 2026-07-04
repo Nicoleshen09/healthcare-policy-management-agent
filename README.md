@@ -4,6 +4,8 @@ An agentic proof of concept that reads an unstructured healthcare coverage polic
 extracts the coverage rules from it, and adjudicates claims against those rules,
 returning a PAY / DENY / REVIEW decision with a citation back to the policy text.
 
+**[▶ Live demo](https://healthcare-policy-management-agent.streamlit.app)**
+
 Domain: content management in health care, specifically converting written coverage
 policy into executable rules and adjudicating claims against them with an audit trail.
 
@@ -103,18 +105,6 @@ citation reasoning is where model judgment shows.
 Because the reference rules are effectively a ground-truth answer key, they also serve
 as a check on the LLM: run LLM mode, compare its extracted rules to the reference, and
 a match confirms the extraction was correct.
-
-## Deployment
-
-Deployed on Streamlit Community Cloud (free):
-
-1. Push this repo to GitHub (public).
-2. Sign in at share.streamlit.io with GitHub.
-3. Create a new app pointing at `app.py`; `requirements.txt` is picked up automatically.
-
-Safety: no API key is committed or stored in Streamlit secrets. The deployed app
-defaults to deterministic mode, which needs no key; LLM mode uses only a key a visitor
-enters in the sidebar.
 
 ## Using a real policy
 
