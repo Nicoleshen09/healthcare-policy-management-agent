@@ -92,19 +92,23 @@ a reader sees in the policy text.
 
 ## Deterministic vs LLM: what is the same and what differs
 
-The final decision is made by the same deterministic `adjudicate()` function in both
-modes, so given the same rules and claims the PAY / DENY / REVIEW outcome is identical
+The final decision is always made by the same deterministic `adjudicate()` function,
+so for a given set of rules and a given claim, the PAY / DENY / REVIEW outcome is fixed
 and reproducible. The LLM is never allowed to decide a claim on its own.
 
-What can differ is upstream of the decision: the search queries the agent chooses, and
-which policy section its reasoning cites. For a non-covered diagnosis, for example, the
-deterministic path cites the Covered Indications section while the LLM sometimes cites
-the more specific Exclusions section. This is expected: the decision converges, the
-citation reasoning is where model judgment shows.
+Across the four sample claims, both modes produce the same four decisions, because the
+LLM extracts the coverage rules correctly. What varies is upstream of the decision: the
+search queries the agent chooses, and which policy section its reasoning cites. For the
+non-covered-diagnosis claim, for example, the deterministic path cites the Covered
+Indications section, while the LLM may instead cite the Exclusions section, which is
+arguably a more precise basis for that denial. The decision converges; the citation is
+where model judgment shows.
 
-Because the reference rules are effectively a ground-truth answer key, they also serve
-as a check on the LLM: run LLM mode, compare its extracted rules to the reference, and
-a match confirms the extraction was correct.
+Decisions match only as long as the extraction is correct. If the LLM mis-extracts a
+rule, a decision could change, which is exactly why two safeguards exist: the reference
+rules act as a ground-truth key to check the extraction (run LLM mode, compare the
+extracted rules to the reference, and a match confirms extraction was correct), and the
+REVIEW path routes anything uncertain to a human.
 
 ## Using a real policy
 
@@ -113,15 +117,38 @@ Local or National Coverage Determination (or an MLN article) into `data/` as tex
 point `run_demo.py` at it. Those documents are public. Proprietary measure specifications
 (for example NCQA HEDIS specifications) are intentionally not used here.
 
-## Design notes and limitations
+## Design notes
 
 - Scope is intentionally small (one policy, a handful of rule fields, four claims) to
   prioritize a clear working concept over completeness.
 - The REVIEW path is the human-in-the-loop seam: anything the rules cannot clear
   automatically is routed to a person rather than auto-denied.
-- A production version would add rule versioning and a policy change comparison mode
-  (diff two policy versions, flag which extracted rules changed), broader rule coverage,
-  and evaluation of the extraction step against a labeled set.
+
+## Limitations
+
+This is a proof of concept, and its scope is deliberately narrow:
+
+- Single synthetic policy. The demo runs on one synthetic coverage policy and four
+  sample claims, not a real corpus. It shows the concept working, not production coverage.
+- Narrow rule schema. Rules capture procedure code, covered diagnosis prefixes, a
+  frequency limit, and prior authorization. Real payer policies involve modifiers, code
+  ranges, place of service, date logic, and combinations this schema does not model.
+- Simple matching. Diagnosis coverage uses ICD-10 prefix matching, which does not handle
+  exclusion codes, code ranges, or finer coding nuances.
+- Offline retrieval is lexical. Deterministic mode uses a hashing bag-of-words retriever
+  with no semantic understanding, so it can miss paraphrased passages. LLM mode uses
+  semantic embeddings.
+- No formal evaluation. Extraction is sanity-checked against the reference rules for one
+  policy, not benchmarked on a labeled dataset, so extraction accuracy at scale is unmeasured.
+- Extraction can fail. The LLM can occasionally emit a malformed or mis-typed rule, which
+  the current code does not fully guard against.
+- Not production-hardened. There is no PHI handling, access control, persistence, or audit
+  logging suitable for real claims data.
+- Section-level citations. Citations point to a policy section, not a specific sentence.
+
+A production version would address these with a richer rule schema, semantic retrieval
+throughout, a labeled evaluation set for extraction accuracy, input and output validation,
+a policy change comparison mode, and appropriate security and governance.
 
 ## Project layout
 
