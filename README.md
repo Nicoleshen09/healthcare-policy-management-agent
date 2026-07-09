@@ -1,13 +1,17 @@
 # Healthcare Policy Management Agent
 
-An agentic proof of concept that reads an unstructured healthcare coverage policy,
-extracts the coverage rules from it, and adjudicates claims against those rules,
-returning a PAY / DENY / REVIEW decision with a citation back to the policy text.
+An agentic proof of concept for healthcare content management. The system reads an unstructured coverage policy, retrieves relevant policy evidence, extracts structured coverage rules, and generates citation-backed claim review recommendations.
+
 
 **[▶ Live demo](https://healthcare-policy-management-agent.streamlit.app)**
 
-Domain: content management in health care, specifically converting written coverage
-policy into executable rules and adjudicating claims against them with an audit trail.
+
+## Deliverables
+
+- [Written Report (PDF)](Deliverables/Agentic_AI_for_Healthcare_Content_Management.pdf)
+- [Written Report (Word)](Deliverables/Agentic_AI_for_Healthcare_Content_Management.docx)
+- [PowerPoint Presentation](Deliverables/Agentic_AI_for_Healthcare_Content_Management.pptx)
+- [Recorded Demo Video](Deliverables/Yue_Shen_Agentic_AI_POC_Video.mp4)
 
 ## What it demonstrates
 
@@ -24,7 +28,7 @@ policy into executable rules and adjudicating claims against them with an audit 
 ## Architecture
 
 ```
-coverage policy  ->  ingest + embed  ->  Agent (plan + reason)  ->  rules + decisions
+coverage policy  ->  ingest + embed  ->  Agent (plan + reason)  ->  rules + recommended decisions
                      (vector store)       |            |             (PAY / DENY / REVIEW)
                                      retriever     adjudicator
                                       (RAG)      (deterministic)
@@ -82,13 +86,20 @@ and re-running shows the decision change live.
 
 | Claim   | Decision | Cite      | Why                                             |
 |---------|----------|-----------|-------------------------------------------------|
-| CLM-001 | PAY      | Section 1-4 | Diabetes dx, prior device > 365 days ago, auth on file |
+| CLM-001 | PAY      | Section 1-4 | Meets procedure, diagnosis, frequency, and authorization criteria |
 | CLM-002 | DENY     | Section 2 | Diagnosis not in the covered set                |
-| CLM-003 | DENY     | Section 3 | Replacement device inside the 12 month window   |
+| CLM-003 | DENY     | Section 3 | Frequency limitation is not met                 |
 | CLM-004 | REVIEW   | Section 4 | Prior authorization not on file                 |
 
-Citation ids follow the document's own section numbering, so a cite lines up with what
-a reader sees in the policy text.
+These labels are used for the prototype workflow. In a production healthcare environment, outputs should be treated as reviewer-facing recommendations and validated by qualified analysts before operational use.
+
+## Tiny RAG layer
+
+The retrieval layer is intentionally small. Because the demo uses one short policy document, it does not require FAISS, Chroma, or a separate vector database.
+
+The policy is split into citable sections. Each section is embedded, and the system uses cosine similarity to retrieve the most relevant policy sections for queries such as diagnosis eligibility, frequency limitations, and prior authorization requirements.
+
+In deterministic mode, the app uses a reproducible hashing-based lexical embedding. In LLM mode, the same vector store can use OpenAI embeddings. This keeps the demo lightweight while preserving the core RAG pattern: grounding outputs in source policy evidence.
 
 ## Deterministic vs LLM: what is the same and what differs
 
@@ -146,9 +157,7 @@ This is a proof of concept, and its scope is deliberately narrow:
   logging suitable for real claims data.
 - Section-level citations. Citations point to a policy section, not a specific sentence.
 
-A production version would address these with a richer rule schema, semantic retrieval
-throughout, a labeled evaluation set for extraction accuracy, input and output validation,
-a policy change comparison mode, and appropriate security and governance.
+A production version would add a richer rule schema, semantic retrieval at scale, policy version comparison, effective-date logic, conflict resolution, labeled evaluation sets, input/output validation, analyst approval workflows, audit logging, and security controls.
 
 ## Project layout
 
@@ -163,6 +172,7 @@ app.py             Streamlit web app (both modes)
 run_demo.py        command-line entry point with mode selection
 data/              synthetic policy, claims, and reference rules
 tests/             deterministic tests (no API key required)
+Deliverables/      report, presentation, and recorded demo video
 ```
 
 ## Tests
